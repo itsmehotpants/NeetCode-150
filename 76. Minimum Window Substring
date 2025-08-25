@@ -1,0 +1,52 @@
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        // Edge case: If either string is empty or s is smaller than t, no valid window exists
+        if (s.empty() || t.empty() || s.length() < t.length()) return "";
+
+        // Frequency map for all ASCII characters (128 size)
+        // mp[c] = how many more times we need char c to complete t in the current window
+        vector<int> mp(128, 0);
+
+        // Initialize the map with frequencies of characters in t
+        for (char c : t) mp[c]++;
+
+        // Sliding window boundaries
+        int l = 0, r = 0;
+        // 'count' represents how many characters from t we still need in the window
+        int count = t.length();
+
+        // Track the smallest window found
+        int minLen = INT_MAX;  // Initially set to infinity
+        int start = 0;         // Start index of best window
+
+        // Expand the window by moving 'r'
+        while (r < s.length()) {
+            // Take character at s[r], then increment r (post-increment)
+            // mp[s[r]]-- : we reduce the needed count for this char
+            // If the char was still needed (mp[...] > 0 before decrement), reduce count
+            if (mp[s[r++]]-- > 0) {
+                count--;
+            }
+
+            // If count == 0, window contains all chars from t
+            while (count == 0) {
+                // Check if this window is smaller than the best one
+                if (r - l < minLen) {
+                    minLen = r - l;
+                    start = l;
+                }
+
+                // Now shrink from left: remove s[l] from the window
+                // ++mp[s[l]]: increase needed count for s[l] because we are removing it
+                // If result > 0, it means we now miss this char, so window becomes invalid
+                if (++mp[s[l++]] > 0) {
+                    count++;
+                }
+            }
+        }
+
+        // If minLen was never updated, return empty string; else return substring
+        return minLen == INT_MAX ? "" : s.substr(start, minLen);
+    }
+};
