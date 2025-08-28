@@ -1,0 +1,20 @@
+class Solution {
+public:
+    int carFleet(int target, vector<int>& pos, vector<int>& speed) {
+         int n = pos.size();
+        vector<pair<int,int>> cars(n);
+        for (int i = 0; i < n; ++i) cars[i] = {pos[i], speed[i]};
+        sort(cars.begin(), cars.end());                 
+
+        int ans = 0;
+        double pre = -1.0;                              
+        for (int i = n - 1; i >= 0; --i) {             
+            double t = double(target - cars[i].first) / cars[i].second;
+            if (t > pre) {                           
+                ++ans;
+                pre = t;
+            }
+        }
+        return ans;
+    }
+};
